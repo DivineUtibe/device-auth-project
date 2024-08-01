@@ -1,15 +1,19 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Register Device</title>
 </head>
 <body>
-    <h1>Register Device</h1>
-    <form method="post">
+    <h1>Register Your Device</h1>
+    <form method="POST" action="{{ url_for('main.register', device_id=device_id) }}">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <br>
         <label for="email">Email:</label>
-        <input type="email" name="email" required>
-        <button type="submit">Register Device</button>
+        <input type="email" id="email" name="email" required>
+        <br>
+        <button type="submit">Register</button>
     </form>
 </body>
 </html>

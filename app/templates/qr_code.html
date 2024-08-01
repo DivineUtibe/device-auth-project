@@ -1,12 +1,11 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>General QR Code</title>
+    <title>QR Code</title>
 </head>
 <body>
-    <h1>General QR Code</h1>
-    <img src="{{ qr_code }}" alt="QR Code">
-    <p>Scan this QR code to register or authenticate your device.</p>
+    <h1>Scan this QR Code</h1>
+    <img src="{{ url_for('static', filename='qrcodes/general_qr.png') }}" alt="QR Code">
+    <p>This QR code will lead you to the sign-in page.</p>
 </body>
 </html>
