@@ -19,7 +19,7 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
     # Set the secret key
-    app.config['SECRET_KEY'] = '5ccb1761f0250a6a3325df84174e94be'  # Replace with your actual secret key
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'default_secret_key')
     
     db.init_app(app)
     migrate.init_app(app, db)
