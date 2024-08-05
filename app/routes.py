@@ -23,7 +23,7 @@ lagos_tz = timezone('Africa/Lagos')
 # Route for home page
 @main.route('/')
 def home():
-    return render_template('home.html')
+    return redirect(url_for('main.device_check'))
 
 # Route to check if the device is registered
 @main.route('/device_check')
@@ -151,7 +151,7 @@ def admin():
     sign_ins = SignIn.query.order_by(SignIn.date.desc(), SignIn.time.desc()).all()
     return render_template('admin.html', devices=devices, sign_ins=sign_ins)
 
-# Move the generate_qr route to the admin page
+# Route to generate the general QR code (admin only)
 @main.route('/admin/generate_qr')
 def generate_qr():
     # Generate static QR code pointing to the device_check endpoint
