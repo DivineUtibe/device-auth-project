@@ -1,13 +1,17 @@
 import os
-from flask import Blueprint, request, render_template, redirect, url_for, flash, current_app, make_response
 import qrcode
 import uuid
+import logging
 from datetime import datetime
-from pytz import timezone  # Import timezone support
+from pytz import timezone
+from flask import Blueprint, request, render_template, redirect, url_for, flash, current_app, make_response
 from .models import Device, SignIn
 from . import db
 
 main = Blueprint('main', __name__)
+
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)
 
 # Generate a unique device ID
 def generate_device_id():
@@ -20,18 +24,6 @@ lagos_tz = timezone('Africa/Lagos')
 @main.route('/')
 def home():
     return render_template('home.html')
-
-# Route to display the general QR code
-@main.route('/generate_qr')
-def generate_qr():
-    # Generate static QR code pointing to the device_check endpoint
-    qr_data = f"{request.host_url}device_check"
-    qr = qrcode.make(qr_data)
-    
-    qr_path = "static/qrcodes/general_qr.png"
-    qr.save(os.path.join(current_app.root_path, qr_path))
-    
-    return render_template('qr_code.html', qr_code=qr_path)
 
 # Route to check if the device is registered
 @main.route('/device_check')
@@ -48,8 +40,8 @@ def device_check():
     device_id = device_id or cookie_device_id
 
     # Debugging output
-    print(f"Device ID from request: {device_id}")
-    print(f"Device ID from cookie: {cookie_device_id}")
+    logging.debug(f"Device ID from request: {device_id}")
+    logging.debug(f"Device ID from cookie: {cookie_device_id}")
 
     # Check if device_id exists
     device = Device.query.filter_by(device_id=device_id).first()
@@ -158,6 +150,19 @@ def admin():
     # Query the SignIn table, ordering by date and time
     sign_ins = SignIn.query.order_by(SignIn.date.desc(), SignIn.time.desc()).all()
     return render_template('admin.html', devices=devices, sign_ins=sign_ins)
+
+# Move the generate_qr route to the admin page
+@main.route('/admin/generate_qr')
+def generate_qr():
+    # Generate static QR code pointing to the device_check endpoint
+    qr_data = f"{request.host_url}device_check"
+    logging.debug(f"Generating QR code with URL: {qr_data}")
+    qr = qrcode.make(qr_data)
+    
+    qr_path = "static/qrcodes/general_qr.png"
+    qr.save(os.path.join(current_app.root_path, qr_path))
+    
+    return render_template('qr_code.html', qr_code=qr_path)
 
 # Route to delete device
 @main.route('/delete_device', methods=['POST'])
