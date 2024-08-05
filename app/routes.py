@@ -157,12 +157,29 @@ def generate_qr():
     # Generate static QR code pointing to the device_check endpoint
     qr_data = f"{request.host_url}device_check"
     logging.debug(f"Generating QR code with URL: {qr_data}")
+    
     qr = qrcode.make(qr_data)
     
-    qr_path = "static/qrcodes/general_qr.png"
-    qr.save(os.path.join(current_app.root_path, qr_path))
+    # Ensure the directory exists
+    qr_directory = os.path.join(current_app.root_path, 'static/qrcodes')
+    if not os.path.exists(qr_directory):
+        os.makedirs(qr_directory)
+        logging.debug(f"Created directory for QR codes: {qr_directory}")
     
-    return render_template('qr_code.html', qr_code=qr_path)
+    # Path to save the QR code
+    qr_path = os.path.join(qr_directory, 'general_qr.png')
+    qr.save(qr_path)
+    
+    # Log whether the file was successfully saved
+    if os.path.exists(qr_path):
+        logging.info(f"QR code saved successfully: {qr_path}")
+    else:
+        logging.error(f"Failed to save QR code at: {qr_path}")
+
+    devices = Device.query.all()
+    sign_ins = SignIn.query.order_by(SignIn.date.desc(), SignIn.time.desc()).all()
+    
+    return render_template('admin.html', qr_code='qrcodes/general_qr.png', devices=devices, sign_ins=sign_ins)
 
 # Route to delete device
 @main.route('/delete_device', methods=['POST'])
