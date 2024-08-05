@@ -31,10 +31,14 @@ def device_check():
     # Check for device ID in the request args
     device_id = request.args.get('device_id')
     cookie_device_id = request.cookies.get('device_id')
-    
+
+    # If neither request arg nor cookie has device ID, generate a new one
     if device_id is None and cookie_device_id is None:
-        flash('Invalid device ID.')
-        return redirect(url_for('main.home'))
+        device_id = generate_device_id()
+        logging.debug(f"Generated new device ID: {device_id}")
+        response = make_response(redirect(url_for('main.register', device_id=device_id)))
+        response.set_cookie('device_id', device_id, max_age=60*60*24*365*2)  # Cookie valid for 2 years
+        return response
 
     # Use device_id from the request if present, otherwise use the cookie
     device_id = device_id or cookie_device_id
